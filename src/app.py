@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, Planet, People, Favorite
+from models import db, User, Planets, People, Favorite
 #from models import Person
 
 app = Flask(__name__)
@@ -55,12 +55,12 @@ def get_people():
 
 @app.route('/planets', methods=['GET'])
 def get_planets():
-    planets = Planet.query.all()
+    planets = Planets.query.all()
     return jsonify([planet.to_dict()for planet in planets])
 
 @app.route('/planets/<int:planet_id>', methods=['GET'])
 def get_planet(planet_id):
-    planet = Planet.query.get(planet_id)
+    planet = Planets.query.get(planet_id)
     if planet: 
         return jsonify(planet.to_dict())
     return jsonify({'message': 'planet not found'}),404
@@ -79,13 +79,13 @@ def get_user_favorites():
 def post_favorites_planet(planet_id):
     user_id = request.args.get('user_id')
     user = User.query.get(user_id)
-    planet = Planet.query.get(planet_id)
+    planet = Planets.query.get(planet_id)
     if planet and user:
         favorite = Favorite(user_id=user_id, planet_id=planet_id)
         db.session.add(favorite)
         db.session.commit()
         return jsonify(favorite.to_dict()), 201
-    return jsonify({'message':'User and PLanet not found'}),404
+    return jsonify({'message':'User and Planet not found'}),404
     
 
 @app.route('/favorite/planet/<int:planet_id>', methods=['DELETE'])
